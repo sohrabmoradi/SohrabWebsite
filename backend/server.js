@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { createClient } from "@supabase/supabase-js";
+const pool = require("./db");  // adjust path if needed
 
 const app = express();
 app.use(bodyParser.json());

@@ -1,12 +1,12 @@
-// backend/db.js
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: process.env.PGUSER || "postgres",
-  host: process.env.PGHOST || "db",
-  database: process.env.PGDATABASE || "mydb",
-  password: process.env.PGPASSWORD || "password",
-  port: process.env.PGPORT || 5432,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: 5432,
+  ssl: { rejectUnauthorized: false }, // Supabase needs SSL
 });
 
 module.exports = pool;
