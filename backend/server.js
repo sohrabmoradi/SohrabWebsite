@@ -39,7 +39,10 @@ app.post("/api/users", async (req, res) => {
 
     console.log("📥 Inserting user:", { name, food });
 
-    const { data, error } = await supabase.from("users").insert([{ name, food }]);
+    const { data, error } = await supabase
+      .from("users")
+      .insert([{ name, food }])
+      .select(); // 👈 ensures inserted row is returned
 
     if (error) {
       console.error("❌ Supabase insert error:", error);
