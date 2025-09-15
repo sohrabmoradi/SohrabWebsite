@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: mywebsite-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: mywebsite-backend
+    ports:
+      - "5000:5000"
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: mydb
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: mywebsite-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
