@@ -1,18 +1,20 @@
-# Stage 1: Install dependencies
-FROM node:18-alpine
+# Use official Node.js LTS image
+FROM node:20
 
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and install
+# Copy package.json and package-lock.json first (for caching)
 COPY package*.json ./
-RUN npm install --production
 
-# Copy app code
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the source code
 COPY . .
 
-# Cloud Run uses PORT environment variable
-ENV PORT 8080
-EXPOSE 8080
+# Expose the port your app runs on
+EXPOSE 5000
 
-# Start your server
-CMD ["node", "index.js"]  # Replace index.js with your main backend file
+# Start the app
+CMD ["node", "server.js"]
