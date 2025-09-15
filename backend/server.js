@@ -1,45 +1,33 @@
-// backend/server.js
-const express = require("express");
-const cors = require("cors");
-const pool = require("./db");
+import express from "express";
+import bodyParser from "body-parser";
+import { createClient } from "@supabase/supabase-js";
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-// Save user
+// Connect to Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// POST new user
 app.post("/api/users", async (req, res) => {
   const { name, food } = req.body;
-  if (!name || !food) return res.status(400).json({ message: "Name and food required" });
+  const { data, error } = await supabase
+    .from("users")
+    .insert([{ name, food }]);
 
-  try {
-    const result = await pool.query(
-      "INSERT INTO users (name, food) VALUES ($1, $2) RETURNING *",
-      [name, food]
-    );
-    res.json({ message: `${result.rows[0].name} likes ${result.rows[0].food}` });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
-// Get all users
+// GET all users
 app.get("/api/users", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM users ORDER BY id DESC");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+  const { data, error } = await supabase.from("users").select("*");
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
-// Use the PORT from environment variables, or fallback to 5000 locally
-const PORT = process.env.PORT || 5000;
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// Cloud Run requires listening on process.env.PORT
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
