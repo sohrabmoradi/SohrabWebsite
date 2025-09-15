@@ -1,7 +1,32 @@
-FROM node:20
+# Stage 1: Build Vite app
+FROM node:18-alpine AS build
+
 WORKDIR /app
+
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
-COPY . .
-EXPOSE 5173
-CMD ["npm", "run", "dev", "--", "--host"]
+
+# Copy all source files
+COPY . ./
+
+# Build Vite app
+RUN npm run build
+
+# Stage 2: Serve the dist folder
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install lightweight server
+RUN npm install -g serve
+
+# Copy the dist folder from build stage
+COPY --from=build /app/dist ./dist
+
+# Cloud Run expects PORT environment variable
+ENV PORT 8080
+EXPOSE 8080
+
+# Serve the dist folder
+CMD ["serve", "-s", "dist", "-l", "8080"]

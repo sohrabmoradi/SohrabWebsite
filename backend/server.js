@@ -35,5 +35,11 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+// Use the PORT from environment variables, or fallback to 5000 locally
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
