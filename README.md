@@ -2,6 +2,9 @@
 
 This project is a simple full-stack web application built with **React (frontend)** and **Node.js/Express (backend)**, deployed on **Google Cloud Run**.  
 It allows users to submit their **name** and **favorite food** into a Supabase database, and view existing entries.
+## Live Demo
+- **Frontend URL:** [https://mywebsite-frontend-980616278291.northamerica-northeast1.run.app](https://mywebsite-frontend-980616278291.northamerica-northeast1.run.app)
+
 
 ---
 
