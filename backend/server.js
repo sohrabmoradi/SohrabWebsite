@@ -1,15 +1,19 @@
-// backend/server.js
 import express from "express";
 import bodyParser from "body-parser";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
+import cors from "cors";
 
-dotenv.config(); // Load environment variables from .env
+dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
 
-// Connect to Supabase
+// Allow frontend access (local + deployed)
+app.use(cors({
+  origin: ["http://localhost:3000", "https://your-frontend-cloudrun-url"] // replace with deployed frontend URL
+}));
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
@@ -19,40 +23,23 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 console.log("✅ Supabase URL:", supabaseUrl);
-
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Health check
-app.get("/", (req, res) => {
-  res.send("✅ Backend is running 🚀");
-});
+app.get("/", (req, res) => res.send("✅ Backend is running 🚀"));
 
 // POST new user
 app.post("/api/users", async (req, res) => {
   try {
     const { name, food } = req.body;
+    if (!name || !food) return res.status(400).json({ error: "Missing 'name' or 'food'." });
 
-    if (!name || !food) {
-      console.warn("⚠️ Missing name or food:", req.body);
-      return res.status(400).json({ error: "Missing 'name' or 'food' in request body." });
-    }
+    const { data, error } = await supabase.from("users").insert([{ name, food }]).select();
+    if (error) return res.status(500).json({ error: error.message });
 
-    console.log("📥 Inserting user:", { name, food });
-
-    const { data, error } = await supabase
-      .from("users")
-      .insert([{ name, food }])
-      .select(); // 👈 ensures inserted row is returned
-
-    if (error) {
-      console.error("❌ Supabase insert error:", error);
-      return res.status(500).json({ error: error.message });
-    }
-
-    console.log("✅ Inserted:", data);
     res.json({ message: "User added", data });
   } catch (err) {
-    console.error("💥 Server crash on POST /api/users:", err);
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -61,17 +48,13 @@ app.post("/api/users", async (req, res) => {
 app.get("/api/users", async (req, res) => {
   try {
     const { data, error } = await supabase.from("users").select("*");
-    if (error) {
-      console.error("❌ Supabase fetch error:", error);
-      return res.status(500).json({ error: error.message });
-    }
+    if (error) return res.status(500).json({ error: error.message });
     res.json(data);
   } catch (err) {
-    console.error("💥 Server crash on GET /api/users:", err);
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Cloud Run / Docker requires listening on process.env.PORT
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -9,7 +9,7 @@ services:
     environment:
       SUPABASE_URL: "https://xlsutfgszqczxaywelgr.supabase.co"
       SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsc3V0ZmdzenFjenhheXdlbGdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NjUyMzMsImV4cCI6MjA3MzU0MTIzM30.TzXjNYKMAC08SyXqkTPntGGI09lh-gbS8iTd3Q4bnRg"
-    depends_on: []
+      PORT: 8080
 
   frontend:
     build: ./frontend
