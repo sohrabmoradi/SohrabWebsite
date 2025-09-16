@@ -5,7 +5,7 @@ services:
     build: ./backend
     container_name: mywebsite-backend
     ports:
-      - "5000:8080"
+      - "5000:8080"   # localhost:5000 -> container:8080
     environment:
       SUPABASE_URL: "https://xlsutfgszqczxaywelgr.supabase.co"
       SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsc3V0ZmdzenFjenhheXdlbGdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NjUyMzMsImV4cCI6MjA3MzU0MTIzM30.TzXjNYKMAC08SyXqkTPntGGI09lh-gbS8iTd3Q4bnRg"
@@ -15,6 +15,6 @@ services:
     build: ./frontend
     container_name: mywebsite-frontend
     ports:
-      - "5173:5173"
+      - "3000:8080"   # localhost:3000 -> container:8080
     depends_on:
       - backend
