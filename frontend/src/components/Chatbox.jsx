@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 
+// Replace this with your deployed backend URL
+const BACKEND_URL = "https://personal-website-backend-980616278291.northamerica-northeast1.run.app";
+
 const Chatbox = () => {
   const [name, setName] = useState("");
   const [food, setFood] = useState("");
@@ -8,17 +11,25 @@ const Chatbox = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!name || !food) {
       setResponse("Please fill out both fields.");
       return;
     }
 
     try {
-      const res = await fetch("https://personal-website-backend-980616278291.northamerica-northeast1.run.app/api/users", {
+      const res = await fetch(`${BACKEND_URL}/api/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, food }),
       });
+
+      if (!res.ok) {
+        console.error("Error status:", res.status, await res.text());
+        setResponse("Error saving data.");
+        return;
+      }
+
       const data = await res.json();
       setResponse(data.message || "Saved successfully!");
       setName("");
@@ -31,7 +42,11 @@ const Chatbox = () => {
 
   const handleShowUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/users");
+      const res = await fetch(`${BACKEND_URL}/api/users`);
+      if (!res.ok) {
+        console.error("Error fetching users:", res.status, await res.text());
+        return;
+      }
       const data = await res.json();
       setUsers(data);
     } catch (err) {
